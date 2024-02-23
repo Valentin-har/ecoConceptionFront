@@ -8,6 +8,38 @@ import AddDialog from "../Components/AddDialog.tsx";
 const CrewPage = () => {
     const [crews, setCrews] = useState<Crew[]>([]);
     const [showModal, setShowModal] = useState(false);
+    const [name, setName] = useState<String>('');
+    const [description, setDescription] = useState<String>('');
+    const [imageUrl, setImageUrl] = useState<String>('');
+
+    const handleNameChange = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setName(event.target.value)
+    }
+
+    const handleDescriptionChange = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setDescription(event.target.value)
+    }
+
+    const handleImageUrlChange = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setImageUrl(event.target.value)
+    }
+
+    const handleSubmit = async () => {
+
+        const data = {
+            crew_name : name,
+            crew_description: description,
+            crew_flag: imageUrl
+        }
+
+        try {
+            const response = await axios.post('http://localhost:8080/crew', data);
+            console.log(response.data); // Réponse du serveur
+            setShowModal(false)
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     async function getCrews() {
         try {
@@ -21,13 +53,15 @@ const CrewPage = () => {
     }
 
     useEffect(() => {
-        getCrews()
-    }, []);
+        if(!showModal){
+            getCrews()
+        }
+    }, [showModal]);
 
     return (
         <Layout content={
             <>
-                {showModal && <AddDialog setShowModal={setShowModal}></AddDialog>}
+                {showModal && <AddDialog setShowModal={setShowModal} handleNameChange={handleNameChange} handleDescriptionChange={handleDescriptionChange} handleImageUrlChange={handleImageUrlChange} handleSubmit={handleSubmit}></AddDialog>}
                 <div className="backdrop-blur-sm bg-white/30 w-full">
                     <header className="text-white py-4 px-8 flex flex-col items-center">
                         <h2 className="text-3xl font-bold">Les équipages</h2>
